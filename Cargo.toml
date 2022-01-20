@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "stunner_client",
+]
+
