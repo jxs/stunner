@@ -2,5 +2,6 @@
 
 members = [
     "stunner_client",
+    "stunner_server",
 ]
 
