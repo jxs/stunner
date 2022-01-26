@@ -1,4 +1,4 @@
-use anyhow::{Result, Context};
+use anyhow::{Context, Result};
 use clap::Parser;
 use std::io::{Error, ErrorKind};
 use std::net::{SocketAddr, ToSocketAddrs, UdpSocket};
@@ -25,10 +25,11 @@ struct Cli {
 // Fetches mapped address of a local Socket
 fn get_mapped_addr(udp_socket: UdpSocket, dst_addr: impl ToSocketAddrs) -> Result<SocketAddr> {
     // Create a binding message
-    let binding_msg = stun_coder::StunMessage::create_request()
-        .add_attribute(stun_coder::StunAttribute::Software {
+    let binding_msg = stun_coder::StunMessage::create_request().add_attribute(
+        stun_coder::StunAttribute::Software {
             description: String::from("stunner"),
-        });
+        },
+    );
 
     // Encode the binding_msg
     let bytes = binding_msg
@@ -68,10 +69,11 @@ fn main() {
 
     // Open a UDP socket
     let udp_socket =
-        UdpSocket::bind((opt.localaddr, opt.localport))
-        .expect("could not bind local address");
+        UdpSocket::bind((opt.localaddr, opt.localport)).expect("could not bind local address");
 
-    let local_addr = udp_socket.local_addr().expect("udp socket should have an address");
+    let local_addr = udp_socket
+        .local_addr()
+        .expect("udp socket should have an address");
 
     let response = get_mapped_addr(udp_socket, (opt.remote_addr, opt.remote_port));
     match response {

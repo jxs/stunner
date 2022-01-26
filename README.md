@@ -1,6 +1,6 @@
 # stunner
 
-Yet another set of STUN client and server using [`stun-coder`](https://github.com/Vagr9K/rust-stun-coder)
+Yet another set of STUN ([RFC5389](https://datatracker.ietf.org/doc/html/)) client and server using [`stun-coder`](https://github.com/Vagr9K/rust-stun-coder)
 
 # stunner-client
 
@@ -27,3 +27,18 @@ OPTIONS:
 ```
 example:\
 `$ stunner-client stun.l.google.com 19302  `
+
+# stunner-server
+
+```
+stunner_server 0.1.0
+
+USAGE:
+    stunner_server [OPTIONS]
+
+OPTIONS:
+    -h, --help           Print help information
+        --port <PORT>    Specify the listening port where the server should run, by default 19302 is
+                         used [default: 3478]
+    -V, --version        Print version information
+```
