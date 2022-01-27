@@ -61,7 +61,8 @@ fn get_mapped_addr(udp_socket: UdpSocket, dst_addr: impl ToSocketAddrs) -> Resul
     Err(Error::new(
         ErrorKind::InvalidData,
         "No XorMappedAddress has been set in response.",
-    ))?
+    )
+    .into())
 }
 
 fn main() {
