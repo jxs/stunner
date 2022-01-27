@@ -1,4 +1,5 @@
 # stunner
+![build](https://github.com/jxs/stunner/actions/workflows/ci/badge.svg)
 
 Yet another set of STUN ([RFC5389](https://datatracker.ietf.org/doc/html/)) client and server using [`stun-coder`](https://github.com/Vagr9K/rust-stun-coder)
 
