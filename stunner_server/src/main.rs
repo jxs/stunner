@@ -49,7 +49,7 @@ async fn serve(addr: impl ToSocketAddrs) -> Result<()> {
 
 /// Parse the stun request and create the appropriate response message.
 fn parse_message(buf: &[u8], src_addr: SocketAddr) -> Option<StunMessage> {
-    let message = match StunMessage::decode(&buf, None) {
+    let message = match StunMessage::decode(buf, None) {
         Ok(message) => message,
         Err(err) => {
             log::debug!(
@@ -109,7 +109,7 @@ fn parse_message(buf: &[u8], src_addr: SocketAddr) -> Option<StunMessage> {
 mod tests {
     use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
-    use stun_coder::{StunMessage, StunMessageClass, StunMessageMethod, StunAttribute};
+    use stun_coder::{StunAttribute, StunMessage, StunMessageClass, StunMessageMethod};
 
     use super::parse_message;
 
@@ -122,16 +122,26 @@ mod tests {
         let response = parse_message(&req_msg.encode(None).unwrap(), socket).unwrap();
         let header = response.get_header();
         let attributes = response.get_attributes();
-        assert!(matches!(header.message_method, StunMessageMethod::BindingRequest));
-        assert!(matches!(header.message_class, StunMessageClass::SuccessResponse));
+        assert!(matches!(
+            header.message_method,
+            StunMessageMethod::BindingRequest
+        ));
+        assert!(matches!(
+            header.message_class,
+            StunMessageClass::SuccessResponse
+        ));
         assert_eq!(attributes.len(), 1);
-        assert!(matches!(attributes[0], StunAttribute::XorMappedAddress { socket_addr} if socket_addr == socket));
+        assert!(
+            matches!(attributes[0], StunAttribute::XorMappedAddress { socket_addr} if socket_addr == socket)
+        );
     }
 
     #[test]
     fn server_doesnt_respond_to_indication_request() {
-        let req_msg =
-            StunMessage::new(StunMessageMethod::BindingRequest, StunMessageClass::Indication);
+        let req_msg = StunMessage::new(
+            StunMessageMethod::BindingRequest,
+            StunMessageClass::Indication,
+        );
         let socket = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8080);
 
         let response = parse_message(&req_msg.encode(None).unwrap(), socket);
@@ -140,31 +150,51 @@ mod tests {
 
     #[test]
     fn server_responds_with_error_to_success_response() {
-        let req_msg =
-            StunMessage::new(StunMessageMethod::BindingRequest, StunMessageClass::SuccessResponse);
+        let req_msg = StunMessage::new(
+            StunMessageMethod::BindingRequest,
+            StunMessageClass::SuccessResponse,
+        );
         let socket = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8080);
 
         let response = parse_message(&req_msg.encode(None).unwrap(), socket).unwrap();
         let header = response.get_header();
         let attributes = response.get_attributes();
-        assert!(matches!(header.message_method, StunMessageMethod::BindingRequest));
-        assert!(matches!(header.message_class, StunMessageClass::ErrorResponse));
+        assert!(matches!(
+            header.message_method,
+            StunMessageMethod::BindingRequest
+        ));
+        assert!(matches!(
+            header.message_class,
+            StunMessageClass::ErrorResponse
+        ));
         assert_eq!(attributes.len(), 1);
-        assert!(matches!(&attributes[0], StunAttribute::ErrorCode { class, number, reason } if class == &4u8 && number == &0u8 && reason == "Invalid binding request class"));
+        assert!(
+            matches!(&attributes[0], StunAttribute::ErrorCode { class, number, reason } if class == &4u8 && number == &0u8 && reason == "Invalid binding request class")
+        );
     }
 
     #[test]
     fn server_responds_with_error_to_error_response() {
-        let req_msg =
-            StunMessage::new(StunMessageMethod::BindingRequest, StunMessageClass::ErrorResponse);
+        let req_msg = StunMessage::new(
+            StunMessageMethod::BindingRequest,
+            StunMessageClass::ErrorResponse,
+        );
         let socket = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8080);
 
         let response = parse_message(&req_msg.encode(None).unwrap(), socket).unwrap();
         let header = response.get_header();
         let attributes = response.get_attributes();
-        assert!(matches!(header.message_method, StunMessageMethod::BindingRequest));
-        assert!(matches!(header.message_class, StunMessageClass::ErrorResponse));
+        assert!(matches!(
+            header.message_method,
+            StunMessageMethod::BindingRequest
+        ));
+        assert!(matches!(
+            header.message_class,
+            StunMessageClass::ErrorResponse
+        ));
         assert_eq!(attributes.len(), 1);
-        assert!(matches!(&attributes[0], StunAttribute::ErrorCode { class, number, reason } if class == &4u8 && number == &0u8 && reason == "Invalid binding request class"));
+        assert!(
+            matches!(&attributes[0], StunAttribute::ErrorCode { class, number, reason } if class == &4u8 && number == &0u8 && reason == "Invalid binding request class")
+        );
     }
 }
