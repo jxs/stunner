@@ -3,6 +3,16 @@ use clap::Parser;
 use std::io::{Error, ErrorKind};
 use std::net::{SocketAddr, ToSocketAddrs, UdpSocket};
 
+// All STUN messages sent over UDP SHOULD be less than the path MTU, if
+// known.  If the path MTU is unknown, messages SHOULD be the smaller of
+// 576 bytes and the first-hop MTU for IPv4 [RFC1122] and 1280 bytes for
+// IPv6 [RFC2460].  This value corresponds to the overall size of the IP
+// packet.  Consequently, for IPv4, the actual STUN message would need
+// to be less than 548 bytes (576 minus 20-byte IP header, minus 8-byte
+// UDP header, assuming no IP options are used).
+// https://datatracker.ietf.org/doc/html/rfc5389#section-7.1
+const MAX_STUN_MSG_SIZE: usize = 1280;
+
 #[derive(Debug, Parser)]
 #[clap(author, version, about)]
 struct Cli {
@@ -43,7 +53,7 @@ fn get_mapped_addr(udp_socket: UdpSocket, dst_addr: impl ToSocketAddrs) -> Resul
     udp_socket.send(&bytes)?;
 
     // Wait for a response
-    let mut response_buf = [0; 512];
+    let mut response_buf = [0; MAX_STUN_MSG_SIZE];
     udp_socket.recv(&mut response_buf)?;
 
     // Decode the response
